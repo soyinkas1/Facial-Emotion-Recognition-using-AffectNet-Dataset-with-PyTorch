@@ -1,0 +1,12 @@
+pandas
+numpy
+cv
+matplotlib
+scikit-learn
+torch
+torchvision
+torchinfo
+tqdm
+python-dotenv
+python-box
+ensure
