@@ -15,14 +15,16 @@ import torch.nn.functional as F
 from torch.optim.lr_scheduler import StepLR, ReduceLROnPlateau
 from sklearn.metrics import (ConfusionMatrixDisplay, confusion_matrix,
                              precision_score, recall_score, f1_score, accuracy_score)
+from sklearn.utils.class_weight import compute_class_weight
 from tqdm import tqdm
 from PIL import Image
+from collections import Counter
 
 # Make reproducable
 torch.manual_seed(42)
 
 # Import custom modules
-from  .logging import logger
+from .logging import logger
 
 
 @ensure_annotations
@@ -99,6 +101,51 @@ def get_mean_std(loader):
     except Exception as e:
         logger.info(f"An error occurred: {e}")
         return None, None
+
+
+# Count the number of classes in a dataloader
+def class_count(loader):
+    """
+    Compute the class distribution from the dataset loader.
+
+    Parameters
+    ----------
+    loader : DataLoader object
+        DataLoader containing batches of images and labels.
+
+    Returns
+    ----------
+    class_counts : Counter object
+        Dictionary-like object with class labels as keys and their respective counts as values.
+    """
+    class_counts = Counter([label for batch in tqdm(loader) for label in batch[1]])
+    
+    logger.info("Class distribution:", class_counts)
+
+    return class_counts
+
+# Calculate the class weights to address imbalance datasets
+def compute_class_weights(class_counts, classes):
+  """Computes the class weights for each class
+
+  Parameters
+  ----------
+  class_counts (dict): Dictionary of the number of samples per class
+  classes (list); List of the classes
+
+  Returns
+  ----------
+  class_weights (tensor): The class weights for each class
+  """
+  y = []
+  for cls in classes:
+    y.extend([cls] * class_counts[cls])
+
+  class_weights= compute_class_weight('balanced', classes=np.unique(y), y=y)
+  class_weights = torch.tensor(class_weights, dtype=torch.float)
+  
+  return class_weights
+
 
 
 # Training loop function
