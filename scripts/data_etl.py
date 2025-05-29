@@ -230,8 +230,7 @@ class DataETL:
         self.test_dataset = Subset(self.dataset, test_idx)
         logger.info('Splitting data completed.......')
 
-    def transform_load(self, dataset_specific_norm=True, batch_size=32, 
-                       data_aug_transformation=None, aug_class=None):
+    def transform_load(self, dataset_specific_norm=True, batch_size=32, aug_class=None):
         """
         Applies transformations to the dataset and optionally performs data augmentation.
 
@@ -283,6 +282,16 @@ class DataETL:
 
             if data_aug_transformation and aug_class:
                 logger.info('Applying data augmentation to training data......')
+
+                # Define Preprocessing and Augmentation Transforms
+                data_aug_transformation = transforms.Compose([
+                    transforms.RandomRotation(20),
+                    transforms.RandomHorizontalFlip(0.5),
+                    transforms.RandomResizedCrop(224, scale=(0.8, 1.0)),
+                    transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2),
+                    transforms.ToTensor(),
+                    transforms.Normalize(mean=mean, std=std)
+                ])
                 
                 train_indices = self.train_dataset.indices
                 train_labels = [self.dataset.full_data.samples[self.dataset.indices[i]][1] for i in train_indices]
