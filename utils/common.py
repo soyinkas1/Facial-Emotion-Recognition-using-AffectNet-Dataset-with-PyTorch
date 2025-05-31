@@ -107,7 +107,7 @@ def get_mean_std(loader):
 
 
 # Count the number of classes in a dataloader
-def class_count(loader, plot=True):
+def class_count(loader, idx_to_class, plot=True):
     """
     Compute the class distribution from the dataset loader.
 
@@ -123,8 +123,8 @@ def class_count(loader, plot=True):
     class_counts : Counter object
         Dictionary-like object with class labels as keys and their respective counts as values.
     """
-    class_counts = Counter([label for batch in tqdm(loader) for label in batch[1]])
-    
+    class_counts = Counter([idx_to_class[label.item()] for batch in tqdm(loader) for label in batch[1]])
+
     if plot:
         df = pd.DataFrame.from_dict(class_counts, orient='index', columns=['Count'])
         df.plot(kind='bar', title='Class Distribution')
