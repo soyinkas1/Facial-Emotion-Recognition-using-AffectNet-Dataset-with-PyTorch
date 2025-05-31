@@ -1,4 +1,7 @@
 # Import standard and external libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 import torch
 # import matplotlib.pyplot as plt
 # import pandas as pd
@@ -104,7 +107,7 @@ def get_mean_std(loader):
 
 
 # Count the number of classes in a dataloader
-def class_count(loader):
+def class_count(loader, plot=True):
     """
     Compute the class distribution from the dataset loader.
 
@@ -112,6 +115,8 @@ def class_count(loader):
     ----------
     loader : DataLoader object
         DataLoader containing batches of images and labels.
+    plot : Boolean options - 'True', 'False'
+            default: 'True' - plot the distribution of the class counts
 
     Returns
     ----------
@@ -120,9 +125,24 @@ def class_count(loader):
     """
     class_counts = Counter([label for batch in tqdm(loader) for label in batch[1]])
     
+    if plot:
+        df = pd.DataFrame.from_dict(class_counts, orient='index', columns=['Count'])
+        df.plot(kind='bar', title='Class Distribution')
+        plt.xlabel('Class')
+        plt.ylabel('Count')
+        plt.show()
+    
     logger.info("Class distribution:", class_counts)
 
     return class_counts
+def plot_class_count(loader, plot=true):
+  class_counts = Counter([label for batch in tqdm(loader) for label in batch[1]])
+
+  df = pd.DataFrame.from_dict(class_counts, orient='index', columns=['Count'])
+  df.plot(kind='bar', title='Class Distribution')
+  plt.xlabel('Class')
+  plt.ylabel('Count')
+  plt.show()
 
 # Calculate the class weights to address imbalance datasets
 def compute_class_weights(class_counts, classes):
