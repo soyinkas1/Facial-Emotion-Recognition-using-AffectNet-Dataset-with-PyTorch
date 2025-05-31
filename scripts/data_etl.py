@@ -89,7 +89,7 @@ class CustomDataset(Dataset):
             if self.transform:
                 image = self.transform(image)
 
-            return image, label.item()
+            return image, label
         except Exception as e:
             raise CustomException(f"Error getting item at index {idx}: {str(e)}", sys)
 
