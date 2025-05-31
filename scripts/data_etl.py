@@ -89,7 +89,7 @@ class CustomDataset(Dataset):
             if self.transform:
                 image = self.transform(image)
 
-            return image, label
+            return image, label.item()
         except Exception as e:
             raise CustomException(f"Error getting item at index {idx}: {str(e)}", sys)
 
@@ -186,7 +186,7 @@ class DataETL:
                 train_labels = [self.dataset.full_data.samples[self.dataset.indices[i]][1] for i in train_indices]
                 class_counts = pd.Series(train_labels).value_counts()
                 target_samples = max(class_counts)
-
+                
                 aug_class_idx = [self.class_to_idx[cls] for cls in aug_class if cls in self.class_to_idx]
                 if not aug_class_idx:
                     logger.info("Warning: No valid classes in aug_class for augmentation")
