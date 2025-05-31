@@ -135,14 +135,6 @@ def class_count(loader, plot=True):
     logger.info("Class distribution:", class_counts)
 
     return class_counts
-def plot_class_count(loader, plot=true):
-  class_counts = Counter([label for batch in tqdm(loader) for label in batch[1]])
-
-  df = pd.DataFrame.from_dict(class_counts, orient='index', columns=['Count'])
-  df.plot(kind='bar', title='Class Distribution')
-  plt.xlabel('Class')
-  plt.ylabel('Count')
-  plt.show()
 
 # Calculate the class weights to address imbalance datasets
 def compute_class_weights(class_counts, classes):
