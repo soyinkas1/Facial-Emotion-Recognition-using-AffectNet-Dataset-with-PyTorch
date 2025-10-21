@@ -177,3 +177,4 @@ cython_debug/
 untracked/
 data/
 data_new/
+.DS_Store
