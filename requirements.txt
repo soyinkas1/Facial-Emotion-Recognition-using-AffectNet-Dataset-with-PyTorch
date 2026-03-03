@@ -1,6 +1,5 @@
 pandas
 numpy
-cv
 matplotlib
 scikit-learn
 torch
@@ -9,4 +8,7 @@ torchinfo
 tqdm
 python-dotenv
 python-box
-ensure
+ensure 
+opencv-python
+albumentations
+jupyter 
