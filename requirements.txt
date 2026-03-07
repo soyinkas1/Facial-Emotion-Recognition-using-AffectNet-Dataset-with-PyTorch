@@ -10,5 +10,5 @@ python-dotenv
 python-box
 ensure 
 opencv-python
-albumentations
+albumentationsx
 jupyter 

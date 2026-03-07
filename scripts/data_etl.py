@@ -9,6 +9,7 @@ from torch.utils.data import DataLoader, TensorDataset, Subset, Dataset
 import torchvision.transforms as transforms
 from sklearn.model_selection import train_test_split
 import sys
+import albumentations as A
 
 # Import custom modules
 from utils.common import get_mean_std
@@ -97,7 +98,7 @@ class DataETL:
     """
     Class for loading, preprocessing, and transforming datasets efficiently.
     """
-    def __init__(self, data_dir, random_state, number_of_images=None, balanced_data=False):
+    def __init__(self, data_dir, random_state=42, number_of_images=None, balanced_data=False):
         try:
             self.data_dir = data_dir
             self.random_state = random_state
@@ -140,7 +141,7 @@ class DataETL:
         except Exception as e:
             raise CustomException(f"Error splitting data: {str(e)}", sys)
 
-    def transform_load(self, dataset_specific_norm=True, batch_size=32, aug_class=None):
+    def transform_load(self, dataset_specific_norm=True, batch_size=32, data_aug_transformation=None,aug_class=None):
         try:
             logger.info('Transformation started......')
 
@@ -173,14 +174,23 @@ class DataETL:
                 logger.info('Applying data augmentation to training data......')
 
                 # Define Preprocessing and Augmentation Transforms
-                data_aug_transformation = transforms.Compose([
-                    transforms.RandomRotation(20),
-                    transforms.RandomHorizontalFlip(0.5),
-                    transforms.RandomResizedCrop(224, scale=(0.8, 1.0)),
-                    transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2),
-                    transforms.ToTensor(),
-                    transforms.Normalize(mean=mean, std=std)
-                ])
+
+
+                data_aug_transformation = A.Compose([
+                A.RandomResizedCrop(size=(224, 224), scale=(0.6, 1.0)),
+                A.HorizontalFlip(p=0.5),
+                A.OneOf([
+                    A.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3, hue=0.2),
+                    A.ToGray(p=1.0),
+                ], p=0.8),
+                A.OneOf([
+                    A.GaussianBlur(blur_limit=(1, 3)),
+                    A.GaussNoise(var_limit=(10, 50)),
+                ], p=0.5),
+                A.CoarseDropout(max_holes=8, max_height=32, max_width=32, p=0.5),
+                A.Normalize(mean=mean, std=std),
+                A.ToTensorV2(),
+            ])
                 
                 train_indices = self.train_dataset.indices
                 train_labels = [self.dataset.full_data.samples[self.dataset.indices[i]][1] for i in train_indices]
@@ -206,7 +216,9 @@ class DataETL:
                         idx = train_indices[cls_indices[np.random.randint(0, current_samples)]]
                         img_path, label = self.dataset.full_data.samples[self.dataset.indices[idx]]
                         img = Image.open(img_path).convert("RGB")
-                        img = data_aug_transformation(img)
+                        img = np.array(img)
+                        result = data_aug_transformation(image=img)
+                        img = result['image']
                         augmented_data.append(img)
                         augmented_labels.append(label)
 
@@ -229,10 +241,10 @@ class DataETL:
         except Exception as e:
             raise CustomException(f"Error during transformation: {str(e)}", sys)
 
-# if __name__ == "__main__":
-#     try:
-#         data_etl = DataETL('data_new', 42, 200, False)
-#         train, val, test = data_etl.transform_load() 
-#         print(type(train))
-#     except Exception as e:
-#         raise CustomException(f"Error in main execution: {str(e)}", sys)
+if __name__ == "__main__":
+    try:
+        data_etl = DataETL('data_new')
+        train, val, test = data_etl.transform_load() 
+        print(type(train))
+    except Exception as e:
+        raise CustomException(f"Error in main execution: {str(e)}", sys)
