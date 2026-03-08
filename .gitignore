@@ -135,7 +135,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-
+venv_mac/
 # Spyder project settings
 .spyderproject
 .spyproject
@@ -177,3 +177,5 @@ cython_debug/
 untracked/
 data/
 data_new/
+.DS_Store
+models/

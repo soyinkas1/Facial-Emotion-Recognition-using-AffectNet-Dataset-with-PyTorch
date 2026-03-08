@@ -9,7 +9,10 @@ from torch.utils.data import DataLoader, TensorDataset, Subset, Dataset
 import torchvision.transforms as transforms
 from sklearn.model_selection import train_test_split
 import sys
+<<<<<<< HEAD
 import albumentations as A
+=======
+>>>>>>> b6ce71441fc0a8892c47ec24e81a5f119128acfb
 
 # Import custom modules
 from utils.common import get_mean_std
@@ -98,7 +101,11 @@ class DataETL:
     """
     Class for loading, preprocessing, and transforming datasets efficiently.
     """
+<<<<<<< HEAD
     def __init__(self, data_dir, random_state=42, number_of_images=None, balanced_data=False):
+=======
+    def __init__(self, data_dir, random_state, number_of_images=None, balanced_data=False):
+>>>>>>> b6ce71441fc0a8892c47ec24e81a5f119128acfb
         try:
             self.data_dir = data_dir
             self.random_state = random_state
@@ -141,7 +148,11 @@ class DataETL:
         except Exception as e:
             raise CustomException(f"Error splitting data: {str(e)}", sys)
 
+<<<<<<< HEAD
     def transform_load(self, dataset_specific_norm=True, batch_size=32, data_aug_transformation=None,aug_class=None):
+=======
+    def transform_load(self, dataset_specific_norm=True, batch_size=32, aug_class=None):
+>>>>>>> b6ce71441fc0a8892c47ec24e81a5f119128acfb
         try:
             logger.info('Transformation started......')
 
@@ -174,6 +185,7 @@ class DataETL:
                 logger.info('Applying data augmentation to training data......')
 
                 # Define Preprocessing and Augmentation Transforms
+<<<<<<< HEAD
 
 
                 data_aug_transformation = A.Compose([
@@ -191,6 +203,16 @@ class DataETL:
                 A.Normalize(mean=mean, std=std),
                 A.ToTensorV2(),
             ])
+=======
+                data_aug_transformation = transforms.Compose([
+                    transforms.RandomRotation(20),
+                    transforms.RandomHorizontalFlip(0.5),
+                    transforms.RandomResizedCrop(224, scale=(0.8, 1.0)),
+                    transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2),
+                    transforms.ToTensor(),
+                    transforms.Normalize(mean=mean, std=std)
+                ])
+>>>>>>> b6ce71441fc0a8892c47ec24e81a5f119128acfb
                 
                 train_indices = self.train_dataset.indices
                 train_labels = [self.dataset.full_data.samples[self.dataset.indices[i]][1] for i in train_indices]
@@ -216,9 +238,13 @@ class DataETL:
                         idx = train_indices[cls_indices[np.random.randint(0, current_samples)]]
                         img_path, label = self.dataset.full_data.samples[self.dataset.indices[idx]]
                         img = Image.open(img_path).convert("RGB")
+<<<<<<< HEAD
                         img = np.array(img)
                         result = data_aug_transformation(image=img)
                         img = result['image']
+=======
+                        img = data_aug_transformation(img)
+>>>>>>> b6ce71441fc0a8892c47ec24e81a5f119128acfb
                         augmented_data.append(img)
                         augmented_labels.append(label)
 
@@ -241,6 +267,7 @@ class DataETL:
         except Exception as e:
             raise CustomException(f"Error during transformation: {str(e)}", sys)
 
+<<<<<<< HEAD
 if __name__ == "__main__":
     try:
         data_etl = DataETL('data_new')
@@ -248,3 +275,12 @@ if __name__ == "__main__":
         print(type(train))
     except Exception as e:
         raise CustomException(f"Error in main execution: {str(e)}", sys)
+=======
+# if __name__ == "__main__":
+#     try:
+#         data_etl = DataETL('data_new', 42, 200, False)
+#         train, val, test = data_etl.transform_load() 
+#         print(type(train))
+#     except Exception as e:
+#         raise CustomException(f"Error in main execution: {str(e)}", sys)
+>>>>>>> b6ce71441fc0a8892c47ec24e81a5f119128acfb
